@@ -52,6 +52,11 @@ Any messages received from Sinric Pro for the configured device are handled by t
             return true;
         }
 
+Notifications can also be sent from the device to Sinric Pro.
+
+        // send random power level...
+        SinricProNotify( DIMMER_ID, "setPowerLevel", PERIODIC_POLL, "powerLevel", value, JSON
+
 This example code can easily be modified to handle other Sinric Pro device types, by extending the "actions" array in SinricPro.c
 
 Original author: Russell Rhodes, https://github.com/RussellRhodes    
