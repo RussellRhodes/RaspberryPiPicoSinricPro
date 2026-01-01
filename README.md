@@ -16,12 +16,12 @@ To configure the connection and device, create a config.h file in the root direc
 
 The connection to the Sinric Pro server is initiated by the following code.
 
-    // Initialise Sinric Pro connection parameters
-    SinricProInit( server_ip, TCP_PORT, APP_KEY, APP_SECRET, DEVICE_IDS, FIRMWARE_VERSION );
-    // Connect to Sinric Pro server and assign message handler
-    if ( SinricProConnect( deviceActionHandler ) ) {
-        printf("Sinric Pro Connected\n");
-    }
+        // Initialise Sinric Pro connection parameters
+        SinricProInit( server_ip, TCP_PORT, APP_KEY, APP_SECRET, DEVICE_IDS, FIRMWARE_VERSION );
+        // Connect to Sinric Pro server and assign message handler
+        if ( SinricProConnect( deviceActionHandler ) ) {
+            printf("Sinric Pro Connected\n");
+        }
 
 Any messages received from Sinric Pro for the configured device are handled by the message handler.
 
