@@ -1,12 +1,10 @@
 # Raspberry Pi Pico W Sinric Pro Example Device
 
-Sinric Pro "Dimmer Switch" Device Example for the Raspberry Pi Pico W
+Sinric Pro "Dimmer Switch" Device Example in C for the Raspberry Pi Pico W.
 
-This gives an example of how the Raspberry Pi Pico can act as a device for SinRic Pro (see https://sinric.pro/), and hence be controlled by Google Home or Alexa commands.
+This gives an example of how the Raspberry Pi Pico W can act as a device for SinRic Pro (see https://sinric.pro/), and hence be controlled by Google Home or Alexa commands.
 
 This simple example receives On/Off and Power Level messages from Sinric Pro, and also periodically sends random Power Level notifications. State change notifications can also be triggered by pressing the BOOTSEL button. It is also capable of supporting other device types, e.g. "Switch", "Garage Door", etc.
-
-This example code can easily be modified to handle other Sinric Pro device types, by extending the "actions" array in SinricPro.c
 
 To configure the connection and device, create a config.h file in the root directory and add the following defines:-
 
@@ -16,6 +14,18 @@ To configure the connection and device, create a config.h file in the root direc
         APP_SECRET      - the APP_SECRET from Sinric Pro
         DEVICE_IDS      - the device ID(s) from Sinric Pro
 
+The connection to the Sinric Pro server is initiated by the following code.
+
+    // Initialise Sinric Pro connection parameters
+    SinricProInit( server_ip, TCP_PORT, APP_KEY, APP_SECRET, DEVICE_IDS, FIRMWARE_VERSION );
+    // Connect to Sinric Pro server and assign message handler
+    if ( SinricProConnect( deviceActionHandler ) ) {
+        printf("Sinric Pro Connected\n");
+    }
+
+This example code can easily be modified to handle other Sinric Pro device types, by extending the "actions" array in SinricPro.c
+
 Original author: Russell Rhodes, https://github.com/RussellRhodes    
-Orignal release date: January 2026    
+Orignal release date: January 2026
+
 This is free and unencumbered software released into the public domain.
