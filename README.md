@@ -1,7 +1,6 @@
-# RaspberryPiPicoSinricPro
+# Raspberry Pi Pico W Sinric Pro Example Device
 
 Sinric Pro "Dimmer Switch" Device Example for the Raspberry Pi Pico W
-
 
 This gives an example of how the Raspberry Pi Pico can act as a device for SinRic Pro (see https://sinric.pro/), and hence be controlled by Google Home or Alexa commands.
 
@@ -18,5 +17,5 @@ To configure the connection and device, create a config.h file in the root direc
         DEVICE_IDS      - the device ID(s) from Sinric Pro
 
 Original author: Russell Rhodes, https://github.com/RussellRhodes    
-This is free and unencumbered software released into the public domain.
 Orignal release date: January 2026    
+This is free and unencumbered software released into the public domain.
