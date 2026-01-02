@@ -290,8 +290,8 @@ int main()
         // Every 5 minute
         if((to_ms_since_boot(get_absolute_time()) - updateTimer) > 300 * 1000) {
 
-            time_t now = SinricProTimestamp();
-            printf("Current time is %s",ctime(&now));            
+            time_t now = SinricProServerTime();
+            printf("Server time is %s",ctime(&now));            
 
             printf("Memory:%dkb free of %dkb\n", getFreeHeap()/1024, getTotalHeap()/1024 );
             

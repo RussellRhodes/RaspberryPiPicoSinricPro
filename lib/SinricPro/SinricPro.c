@@ -133,7 +133,7 @@ static void handleWSmessage( WebSocketClient_p client,  char *msg, int len )
         timestampSecsBoot = to_ms_since_boot(get_absolute_time())/1000;
         timestamp = data.integer;
         printf( "timestamp: '%lld'\n", timestamp );    
-        time_t now = SinricProTimestamp();
+        time_t now = SinricProServerTime();
         printf("Current time is %s",ctime(&now));            
         unknown = false;
     } 
@@ -178,7 +178,7 @@ static void handleWSmessage( WebSocketClient_p client,  char *msg, int len )
                                 }
 
                                 char json_buffer[BUF_SIZE+1];
-                                createdAt = SinricProTimestamp();
+                                createdAt = SinricProServerTime();
 
                                 // build "payload" so we can create signature...
                                 json_put_start( json_buffer, BUF_SIZE );
@@ -324,7 +324,7 @@ bool SinricProNotify( char *deviceId, char *action, SinricProCause_t cause, char
 {
     bool result = false;
     char json_buffer[BUF_SIZE+1];
-    int64_t createdAt = SinricProTimestamp();
+    int64_t createdAt = SinricProServerTime();
     char *causeText = cause==PHYSICAL_INTERACTION?"PHYSICAL_INTERACTION":cause==PERIODIC_POLL?"PERIODIC_POLL":"UNKNOWN CAUSE";
 
     // build "payload" so we can create signature...
@@ -370,7 +370,7 @@ bool SinricProNotify( char *deviceId, char *action, SinricProCause_t cause, char
  * \param None
  * \return true Unix timestamp
  */
-int64_t SinricProTimestamp( void )
+int64_t SinricProServerTime( void )
 {
     int64_t result = timestamp + ( to_ms_since_boot(get_absolute_time())/1000 - timestampSecsBoot);
     return result;
