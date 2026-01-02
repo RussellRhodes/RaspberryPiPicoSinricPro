@@ -134,7 +134,7 @@ static void handleWSmessage( WebSocketClient_p client,  char *msg, int len )
         timestamp = data.integer;
         printf( "timestamp: '%lld'\n", timestamp );    
         time_t now = SinricProServerTime();
-        printf("Current time is %s",ctime(&now));            
+        printf("Current server time is %s",ctime(&now));            
         unknown = false;
     } 
     // if device message parse message for required data...
