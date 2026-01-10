@@ -170,7 +170,7 @@ static uint64_t wsBuildPacket(char* buffer, uint64_t bufferLen, enum WebSocketOp
     }
 
     // Insert masking key
-    if(header.meta.bits.MASK && buffer!=NULL && payloadLen>0) {
+    if(header.meta.bits.MASK && buffer!=NULL /*&& payloadLen>0*/ ) {
         buffer[payloadIndex] = header.mask.maskBytes[0];
         buffer[payloadIndex + 1] = header.mask.maskBytes[1];
         buffer[payloadIndex + 2] = header.mask.maskBytes[2];
@@ -196,6 +196,8 @@ static uint64_t wsBuildPacket(char* buffer, uint64_t bufferLen, enum WebSocketOp
             }
         }
     }
+
+    //printf("Frame header length [%d], pay load length %lld\n", payloadIndex, payloadLen);
 
     return (payloadIndex + payloadLen);
 
@@ -264,9 +266,11 @@ bool wsSendOpCode( WebSocketClient_p client, enum WebSocketOpCode opCode )
 
     #ifdef WIZNET_BOARD
     int buffer_len = wsBuildPacket((char *)state->send_buf, BUF_SIZE, opCode, NULL, 0, 1);
+    //printf("Sent opCode [%d] length [%d]\n", opCode, buffer_len );
     result = ( httpc_send_body(state->send_buf, buffer_len) == buffer_len );
     #else
     state->buffer_len = wsBuildPacket((char *)state->en, BUF_SIZE, opCode, NULL, 0, 1);
+    //printf("Sent opCode [%d] length [%d]\n", opCode, state->buffer_len );
     result = ( tcp_write(state->tcp_pcb, state->en, state->buffer_len, TCP_WRITE_FLAG_COPY) == ERR_OK );
     #endif
 
@@ -432,7 +436,7 @@ err_t wsReceive(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err)
                 case WEBSOCKET_OPCODE_PING:
                     // send pong
                     uint32_t now = to_ms_since_boot(get_absolute_time());
-                    printf("WebSocket received PING (@ %d s)\n", (int)(now-state->lastPing)/1000);
+                    printf("WebSocket received PING (@ %ds)\n", (int)(now-state->lastPing)/1000);
                     state->lastPing = now;
                     reply_pong = true;
                     break;
@@ -486,7 +490,7 @@ err_t wsReceive(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err)
     if ( reply_pong ) {
         // send pong
         if ( wsSendOpCode( arg, WEBSOCKET_OPCODE_PONG ) ) {
-            printf("WebSocket sent PONG (%d)\n", buffer_len);
+            printf("WebSocket sent PONG\n");
         } else {    
             printf("WebSocket PONG send failed!\n");
         }
@@ -536,14 +540,14 @@ static err_t wsTCPConnect(void *arg)
 /*! \brief Initialises a WebSocket for connection
  *  \ingroup Websocket.c
  *
- * \param server ip address of target server
+ * \param server_ip ip address of target server
  * \param port port on which to connect
  * \param messageHandler callback to handle received messages
  * \param additioonalHeaders additional headers to include in the connect
  * \param autoReconnect automatically reconnect if the connection is closed
  * \return handle to a WebSocket client
  */
-WebSocketClient_p wsCreate( const char *server, uint16_t port, wsMessagehandler messageHandler, char *additionalHeaders, bool autoReconnect )
+WebSocketClient_p wsCreate( const char *server_ip, uint16_t port, wsMessagehandler messageHandler, char *additionalHeaders, bool autoReconnect )
 {
     WebSocketClient_t *state = (WebSocketClient_t *)calloc(1, sizeof(WebSocketClient_t));
     if (!state) {
@@ -552,9 +556,9 @@ WebSocketClient_p wsCreate( const char *server, uint16_t port, wsMessagehandler 
     }
 
     #ifdef WIZNET_BOARD
-        state->remote_addr = strdup( server );
+        state->remote_addr = strdup( server_ip );
     #else 
-        ip4addr_aton(server, &state->remote_addr);
+        ip4addr_aton(server_ip, &state->remote_addr);
     #endif
     state->remote_port = port;
     state->messageHandler = messageHandler;
@@ -664,9 +668,9 @@ bool wsSendMessage( WebSocketClient_p client, char *text, size_t len )
  *  \ingroup Websocket.c
  *
  * \param Nothing
- * \return Nothing
+ * \return connection state TCP_DISCONNECTED, TCP_CONNECTING, or TCP_CONNECTED
  */
-void wsHandler( WebSocketClient_p client )
+int wsHandler( WebSocketClient_p client )
 {
     WebSocketClient_t *state = (WebSocketClient_t *)client;
 
@@ -680,7 +684,7 @@ void wsHandler( WebSocketClient_p client )
         } else {
             uint32_t now = to_ms_since_boot(get_absolute_time());
             if ( (now-state->lastPing) > PING_TIMEOUT ) {
-                printf("WebSocket PING timeout (%d s), closing socket\n", (int)(now-state->lastPing)/1000);
+                printf("WebSocket PING timeout (%ds), closing socket\n", (int)(now-state->lastPing)/1000);
                 wsClose( client );
             }
         }
@@ -700,7 +704,8 @@ void wsHandler( WebSocketClient_p client )
         printf("WebSocket not connected, closing socket\n");
         wsClose( client );
     }
-
     #endif
+
+    return(state->connected);
 }
 

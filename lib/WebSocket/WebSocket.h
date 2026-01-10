@@ -16,12 +16,12 @@ extern "C" {
 typedef void *WebSocketClient_p;
 typedef void (*wsMessagehandler)( WebSocketClient_p client, char *message, int len );
 
-WebSocketClient_p wsCreate( const char *server, uint16_t port, wsMessagehandler messageHandler, char *additional_headers, bool autoReconnect );
+WebSocketClient_p wsCreate( const char *server_ip, uint16_t port, wsMessagehandler messageHandler, char *additional_headers, bool autoReconnect );
 bool wsConnect( WebSocketClient_p client );
 bool wsDestroy( WebSocketClient_p client );
 int wsConnectState( WebSocketClient_p client );
 bool wsSendMessage( WebSocketClient_p client, char *text, size_t len );
-void wsHandler( WebSocketClient_p client );
+int wsHandler( WebSocketClient_p client );
 
 #ifdef __cplusplus
 }
