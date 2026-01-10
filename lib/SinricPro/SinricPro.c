@@ -65,19 +65,19 @@ static bool defaultActionHandler( char *deviceId, char *action, jsonValue_t valu
 {
     switch( dataType ) {
         case JSON_TEXT:
-            printf("Device[%s] %s=[%s]\n",deviceId,action,value.text);
+            printf("Sinric Pro device[%s] %s=[%s]\n",deviceId,action,value.text);
             break;
         case JSON_INTEGER:
-            printf("Device[%s] %s=[%lld]\n",deviceId,action,value.integer);
+            printf("Sinric Pro device[%s] %s=[%lld]\n",deviceId,action,value.integer);
             break;
         case JSON_REAL:
-            printf("Device[%s] %s=[%.2f]\n",deviceId,action,value.real);
+            printf("Sinric Pro device[%s] %s=[%.2f]\n",deviceId,action,value.real);
             break;
         case JSON_BOOLEAN:
-            printf("Device[%s] %s=[%s]\n",deviceId,action,value.boolean?"true":"false");
+            printf("Sinric Pro device[%s] %s=[%s]\n",deviceId,action,value.boolean?"true":"false");
             break;
         default:
-            printf("Device[%s] %s=[dataType %d not handled]\n",deviceId,action,dataType);
+            printf("Sinric Pro device[%s] %s=[dataType %d not handled]\n",deviceId,action,dataType);
             break;
     }
 
@@ -96,7 +96,7 @@ static char *getSignature( char *payload )
     //printf("signature=[%s](%d)\n",signature,strlen(signature));
 
     if ( strlen(signature) > (SHA256_HASH_SIZE/3)*4+4 ) {
-        printf("SIGNATURE BUFFER OVERFLOW !!!\n");
+        printf("Sinric Pro SIGNATURE BUFFER OVERFLOW !!!\n");
     }
 
     return signature;
@@ -131,15 +131,15 @@ static void handleWSmessage( WebSocketClient_p client,  char *msg, int len )
     char *value_text = NULL;
     int64_t createdAt = 0;
 
-    printf("Message received\n");
+    printf("Sinric Pro Message received\n");
 
     // if timestamp store and use as base time...
     if  ( json_get( msg, "timestamp", JSON_INTEGER, &data ) ) {
         timestampSecsBoot = to_ms_since_boot(get_absolute_time())/1000;
         timestamp = data.integer;
-        printf( "timestamp: '%lld'\n", timestamp );    
+        printf( "Sinric Pro Timestamp: '%lld'\n", timestamp );    
         time_t now = SinricProServerTime();
-        printf("Current server time is %s",ctime(&now));            
+        printf("Sinric Pro current server time is %s",ctime(&now));            
         unknown = false;
     } 
     // if device message parse message for required data...
@@ -212,15 +212,15 @@ static void handleWSmessage( WebSocketClient_p client,  char *msg, int len )
 
                                 // send response...
                                 if ( wsSendMessage( client, json_buffer, strlen(json_buffer) ) ) {
-                                    printf("Response sent\n");
+                                    printf("Sinric Pro response sent\n");
                                 } else {    
-                                    printf("Failed to send response\n");
+                                    printf("Sinric Pro failed to send response\n");
                                 }
                             } else {
-                                printf("Data [%s] not found\n",actions[actionNum].deviceValueName);
+                                printf("Sinric Pro data not found for action [%s]\n",actions[actionNum].deviceValueName);
                             }
                         } else {
-                            printf("Unexpected action [%s]\n",action);
+                            printf("Sinric Pro unexpected action [%s]\n",action);
                         }
                     } 
                 }
@@ -230,7 +230,7 @@ static void handleWSmessage( WebSocketClient_p client,  char *msg, int len )
 
     // if we don't recognise the message print it out...
     if ( unknown ) {
-        printf("Message unknown or invalid\n[%.*s](%d)\n",len,msg,len);
+        printf("Sinric Pro message unknown or invalid\n[%.*s](%d)\n",len,msg,len);
     }
 
     // free resources...
@@ -282,8 +282,8 @@ bool SinricProInit(const char *server, uint16_t port, const char *appKey, const 
     const char *ip_address = strdup(localIPAddress);
     const char *mac_address = strdup(localMACAddress);
 
-    printf("ip address=[%s]\n", ip_address);
-    printf("mac address=[%s]\n",mac_address);
+    //printf("ip address=[%s]\n", ip_address);
+    //printf("mac address=[%s]\n",mac_address);
 
     // create additional web socket headers for Sinric Pro...
     char additional_headers[300];
@@ -364,10 +364,10 @@ bool SinricProNotify( char *deviceId, char *action, SinricProCause_t cause, char
 
     // send request...
     if ( wsSendMessage( wsClient, json_buffer, strlen(json_buffer) ) ) {
-        printf("Notify request [%s] sent\n", action);
+        printf("Sinric Pro Notify request [%s] sent\n", action);
         result = true;
     } else {    
-        printf("Failed to send [%s] notify request\n", action);
+        printf("Sinric Pro Failed to send [%s] notify request\n", action);
     }
     
     return result;
@@ -377,11 +377,11 @@ bool SinricProNotify( char *deviceId, char *action, SinricProCause_t cause, char
  *  \ingroup SinricPro.c
  *
  * \param Nothing
- * \return Nothing
+ * \return true if connected
  */
-void SinricProHandler( void )
+bool SinricProHandler( void )
 {
-    wsHandler( wsClient );
+    return (wsHandler( wsClient )==TCP_CONNECTED);
 }
 
 /*! \brief Gets current time as sent by the Sinric Pro Server
